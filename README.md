@@ -1,2 +1,3 @@
 # Social-Choice-Thesis
-# Social-Choice-Thesis
+
+Space for simulations, etc.
