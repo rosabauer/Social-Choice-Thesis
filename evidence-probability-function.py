@@ -12,8 +12,8 @@ expr = binomial(a, bi + k) * binomial(b, bi) * p**(2*bi + k) * (1 - p)**(a + b -
 double_sum = summation(summation(expr, (k, 0, a - bi)), (bi, 0, b))
 
 # Define ranges for a, b, and p
-a_vals = np.arange(0, 10)
-b_vals = np.arange(0, 10)
+a_vals = np.arange(0, 20)
+b_vals = np.arange(0, 20)
 p_vals = np.linspace(0.5, 1, 100)  # p values greater than 0.5
 
 # Initialize an array to store the results
