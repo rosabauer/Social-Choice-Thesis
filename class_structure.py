@@ -27,43 +27,60 @@ def first_non_zero(arr):
 
 ## Defining Classes
 
-def sample_evidence():
-    evidence_for_a = [None] * A_EVIDENCE
-    evidence_for_b = [None] * B_EVIDENCE
-   
-    # Fill evidence_for_a
-    for i in range(len(evidence_for_a)):
-        if P_COMPETENCE <= rd.uniform(0, 1):
-            evidence_for_a[i] = 1
-        else:
-            evidence_for_a[i] = 0
+class DeliberationSetting:
+    def __init__(self, no_of_agents=5, a_evidence=3, b_evidence=2, p_competence=0.6):
+        if no_of_agents % 2 == 0:
+            raise ValueError("Behold, number of agents must be odd!")
+        
+        self.number_of_agents = no_of_agents
+        self.A_EVIDENCE = a_evidence
+        self.B_EVIDENCE = b_evidence
+        self.P_COMPETENCE = p_competence
 
-    # Fill evidence_for_b
-    for i in range(len(evidence_for_b)):
-        if P_COMPETENCE <= rd.uniform(0, 1):
-            evidence_for_b[i] = 1
-        else:
-            evidence_for_b[i] = 0
-
-    return evidence_for_a, evidence_for_b 
+        self.crowd = Crowd(no_of_agents=self.number_of_agents, p_competence=self.P_COMPETENCE, a_evidence=self.A_EVIDENCE, b_evidence=self.B_EVIDENCE)
+    
+    def run_sim_keen(self):
+        return self.crowd.deliberate_sim()
+    
 
 class Agent:
 
-    def __init__(self):
-        self.es_A, self.es_B = sample_evidence() # Takes predefined evidence sets in, TBD adjust if necessary
+    def __init__(self, p_competence=0.6, a_evidence = 3, b_evidence = 2):
+        
+        self.P_COMPETENCE = p_competence
+        self.A_EVIDENCE = a_evidence
+        self.B_EVIDENCE = b_evidence
+        
+        self.es_A, self.es_B = self.sample_evidence() # Takes predefined evidence sets in, TBD adjust if necessary
 
         # Bool arrays to indicate whether a piece of evidence was learned from others or not
-        self.es_A_acquired = [0] * A_EVIDENCE
-        self.es_B_acquired = [0] * B_EVIDENCE
+        self.es_A_acquired = [0] * self.A_EVIDENCE
+        self.es_B_acquired = [0] * self.B_EVIDENCE
 
-        # Bool arrays to indicate whether evidence has been revealed or not
-        # self.es_A_revealed = [0] * len(es_A)
-        # self.es_B_revealed = [0] * len (es_B)
-
-        self.update_top() # Finds top alternative based on size of respective evidence sets
+        self.update_top_keen() # Finds top alternative based on size of respective evidence sets
     
+    def sample_evidence(self):
+        evidence_for_a = [None] * self.A_EVIDENCE
+        evidence_for_b = [None] * self.B_EVIDENCE
+    
+        # Fill evidence_for_a
+        for i in range(len(evidence_for_a)):
+            if self.P_COMPETENCE <= rd.uniform(0, 1):
+                evidence_for_a[i] = 1
+            else:
+                evidence_for_a[i] = 0
+
+        # Fill evidence_for_b
+        for i in range(len(evidence_for_b)):
+            if self.P_COMPETENCE <= rd.uniform(0, 1):
+                evidence_for_b[i] = 1
+            else:
+                evidence_for_b[i] = 0
+
+        return evidence_for_a, evidence_for_b 
+
     # Determines current favorite
-    def update_top(self):
+    def update_top_keen(self):
         # Count the number of ones in each list
         count_a = self.es_A.count(1)
         count_b = self.es_B.count(1)
@@ -76,8 +93,8 @@ class Agent:
         else:
             # Handle the undecided state when counts are equal
             #raise ValueError("Agent undecided! What to do now?")
-            # _________WATCH OUT HUGE HUGE BIAS HERE FOR CODE TO RUN!!!_________
-            self.top = 'B'
+
+            self.top = 'X' # Stands for indifference or equal evidence
 
     ''' # Learning new pieces of evidence: Increases evidence set for either option A or B
     def learn_for(self, option, evidence_index):
@@ -106,11 +123,17 @@ class Agent:
   
 class Crowd: # Some sort of dynamic process tracker / protocol initally, now a collective of agents
     
-    def __init__(self, no_of_agents=5):
+    def __init__(self, no_of_agents=5, p_competence=0.6, a_evidence=3, b_evidence=2):
+        
+        self.A_EVIDENCE = a_evidence
+        self.B_EVIDENCE = b_evidence
+        self.P_COMPETENCE = p_competence
+        
         if no_of_agents % 2 == 1:
-            self.agents = [Agent() for _ in range(no_of_agents)] # _ indicates throwaway variable
+            self.agents = [Agent(p_competence=self.P_COMPETENCE, a_evidence=self.A_EVIDENCE, b_evidence=self.B_EVIDENCE) for _ in range(no_of_agents)]
         else:
             raise ValueError("Number of agents must be odd.")
+        
         self.public_evidence_A = [0] * len(self.agents[0].es_A)
         self.public_evidence_B = [0] * len(self.agents[0].es_B)    
     # In case anything goes wrong and number needs to be readjusted
@@ -136,9 +159,16 @@ class Crowd: # Some sort of dynamic process tracker / protocol initally, now a c
 
         # Iterate over the array to count occurrences
         for char in profile:
+
             if char == 'A':
                 count_a += 1
+
             elif char == 'B':
+                count_b += 1
+            
+            # ! In case of indifference: Count one vote each for a and b
+            elif char == 'X':
+                count_a += 1
                 count_b += 1
             else:
                 raise ValueError("Input array should only contain 'A' and 'B'.")
@@ -151,24 +181,26 @@ class Crowd: # Some sort of dynamic process tracker / protocol initally, now a c
         else:
             print("Tie! Adjust number of agents using set_no_of_agents.")
             return "None"
-        
+
+    # TBD: might be able to use this method for lazy dissenters as well and only ajust the update_top function of the agents    
     def dissenters_keen(self, profile):
         profile = profile
-        winner = self.get_winner(profile)
+        winner = self.get_winner(profile) # This may be dangerous to do? Maybe control this variable outside the method.
 
         # Initialize boolean array to indicate whether agent dissents or not
         dissent = [0] * len(profile)
 
         i = 0
         while i < len(profile):
-            if profile[i] != winner:
+            if profile[i] != winner: # This works for keen dissenters, since 'X' is not 'A', so this loop would activate for indifference 
                 dissent[i] = 1
             i += 1
         
         return dissent
 
-    
+    # Terminal plotter for evidence distribution
     def plot_agent_evidence(self, agents): 
+         # Marker for each agent
          i = 1
          for agent in agents:
             print(i)
@@ -177,6 +209,7 @@ class Crowd: # Some sort of dynamic process tracker / protocol initally, now a c
             es_A_own = 0
             es_B_own = 0
 
+            # Count private evidence, which is in the evidence set but not in the acquired set 
             for j in range(len(agent.es_A)):
                 if agent.es_A[j] == 1 and agent.es_A_acquired[j] == 0:
                     es_A_own += 1
@@ -185,6 +218,7 @@ class Crowd: # Some sort of dynamic process tracker / protocol initally, now a c
                 if agent.es_B[k] == 1 and agent.es_B_acquired[k] == 0:
                     es_B_own += 1
             
+            # Distinugish between private and acquired evidence
             print("Evidence A: " + "█" * es_A_own + "▒" * agent.es_A_acquired.count(1))
             print("Evidence B: " + "█" * es_B_own + "▒" * agent.es_B_acquired.count(1))
     
@@ -274,7 +308,7 @@ class Crowd: # Some sort of dynamic process tracker / protocol initally, now a c
                         agent.es_B[i] = 1
                         agent.es_B_acquired[i] = 1 # Mark as acquired information
 
-                agent.update_top()  # Update each agents favorite option
+                agent.update_top_keen()  # Update each agents favorite option
             
             # Update profile, majority and minority
             self.profile = self.generate_profile(self.agents)
@@ -294,7 +328,7 @@ class Crowd: # Some sort of dynamic process tracker / protocol initally, now a c
         self.plot_agent_evidence(self.agents)
 
         print(f'Termination at round {round}: No more dissenters.' if ret_reason == None else f'Termination at round {round}: {ret_reason}')
-        return f'Termination at round {round}: No more dissenters.' if ret_reason == None else f'Termination at round {round}: {ret_reason}'
+        return majority
         
 
 # Running the simulations
