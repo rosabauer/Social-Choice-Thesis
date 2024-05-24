@@ -47,5 +47,3 @@ plt.ylabel('Relative success rate in 5000 iterations with randomly generated evi
 plt.title('Is this Jury-Theorem-worthy?')
 
 plt.show()
-
-

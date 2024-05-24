@@ -166,10 +166,9 @@ class Crowd: # Some sort of dynamic process tracker / protocol initally, now a c
             elif char == 'B':
                 count_b += 1
             
-            # ! In case of indifference: Count one vote each for a and b
+            # ! In case of indifference: Do nothing
             elif char == 'X':
-                count_a += 1
-                count_b += 1
+                continue
             else:
                 raise ValueError("Input array should only contain 'A' and 'B'.")
 
