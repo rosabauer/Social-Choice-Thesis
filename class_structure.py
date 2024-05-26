@@ -65,14 +65,14 @@ class Agent:
     
         # Fill evidence_for_a
         for i in range(len(evidence_for_a)):
-            if self.P_COMPETENCE <= rd.uniform(0, 1):
+            if rd.uniform(0, 1) <= self.P_COMPETENCE:
                 evidence_for_a[i] = 1
             else:
                 evidence_for_a[i] = 0
 
         # Fill evidence_for_b
         for i in range(len(evidence_for_b)):
-            if self.P_COMPETENCE <= rd.uniform(0, 1):
+            if rd.uniform(0, 1) <= self.P_COMPETENCE:
                 evidence_for_b[i] = 1
             else:
                 evidence_for_b[i] = 0
@@ -179,7 +179,7 @@ class Crowd: # Some sort of dynamic process tracker / protocol initally, now a c
             return 'B'
         else:
             print("Tie! Adjust number of agents using set_no_of_agents.")
-            return "None"
+            return None
 
     # TBD: might be able to use this method for lazy dissenters as well and only ajust the update_top function of the agents    
     def dissenters_keen(self, profile):
@@ -289,7 +289,7 @@ class Crowd: # Some sort of dynamic process tracker / protocol initally, now a c
                     self.public_evidence_A[i] = 1
         
             for i in range(len(revealed_in_round_B)):
-                if revealed_in_round_B == 1:
+                if revealed_in_round_B[i] == 1:
                     self.public_evidence_B[i] = 1
 
             # Update the indivdual evidence sets of agents to take on the revealed evidence
