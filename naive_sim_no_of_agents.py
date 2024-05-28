@@ -1,4 +1,7 @@
-from class_structure import DeliberationSetting
+
+# Code for previous type of graphic
+
+'''from class_structure import DeliberationSetting
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -58,4 +61,51 @@ plt.xlabel('Competencies from 0.1 to 1.0 in 0.05 increments')
 plt.ylabel('Relative success rate in 5000 iterations with randomly generated evidence sets')
 plt.title('Is this Jury-Theorem-worthy?')
 plt.legend()
+plt.show() '''
+
+
+## Code for no_of_agents_dependent competency
+# WATCH OUT: Too many operations for M1 as is
+import numpy as np
+import matplotlib.pyplot as plt
+from class_structure import DeliberationSetting
+
+iterations_per_agent = 5000
+competence = 0.6
+agent_counts = [2,4,8,16,32]  # Number of agents from 2 to 10
+
+# Array with values showing success rate corresponding to number of agents
+success_rates = []
+
+for agents in agent_counts:
+    single_round_successes = []
+    ties = 0
+    
+    # Create new deliberation setting with the corresponding number of agents
+    deliberation_setting = DeliberationSetting(no_of_agents=agents, p_competence=competence)
+    
+    j = 0
+    # Run specified number of times
+    while j < iterations_per_agent:
+        result = deliberation_setting.run_sim_keen()
+        
+        if result is not None:
+            single_round_successes.append(result)
+            j += 1
+        else:
+            ties += 1
+    
+    # Calculate relative success
+    success_rate = single_round_successes.count('A') / iterations_per_agent
+    success_rates.append(success_rate)
+
+# Generate the new plot with number of agents vs success rate
+plt.figure(figsize=(8, 6))
+
+plt.title("Success Rate vs Number of Agents for p = 0.6")
+plt.xlabel("Number of Agents")
+plt.ylabel("Success Rate")
+plt.plot(agent_counts, success_rates, marker='o')
+
+plt.tight_layout()
 plt.show()

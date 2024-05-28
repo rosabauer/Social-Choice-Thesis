@@ -29,8 +29,8 @@ def first_non_zero(arr):
 
 class DeliberationSetting:
     def __init__(self, no_of_agents=5, a_evidence=3, b_evidence=2, p_competence=0.6):
-        if no_of_agents % 2 == 0:
-            raise ValueError("Behold, number of agents must be odd!")
+        '''if no_of_agents % 2 == 0:
+            raise ValueError("Behold, number of agents must be odd!")'''
         
         self.number_of_agents = no_of_agents
         self.A_EVIDENCE = a_evidence
@@ -129,10 +129,10 @@ class Crowd: # Some sort of dynamic process tracker / protocol initally, now a c
         self.B_EVIDENCE = b_evidence
         self.P_COMPETENCE = p_competence
         
-        if no_of_agents % 2 == 1:
-            self.agents = [Agent(p_competence=self.P_COMPETENCE, a_evidence=self.A_EVIDENCE, b_evidence=self.B_EVIDENCE) for _ in range(no_of_agents)]
-        else:
-            raise ValueError("Number of agents must be odd.")
+        #if no_of_agents % 2 == 1:
+        self.agents = [Agent(p_competence=self.P_COMPETENCE, a_evidence=self.A_EVIDENCE, b_evidence=self.B_EVIDENCE) for _ in range(no_of_agents)]
+        #else:
+           # raise ValueError("Number of agents must be odd.")
         
         self.public_evidence_A = [0] * len(self.agents[0].es_A)
         self.public_evidence_B = [0] * len(self.agents[0].es_B)    
