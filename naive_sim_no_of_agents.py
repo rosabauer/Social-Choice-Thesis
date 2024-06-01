@@ -72,7 +72,7 @@ from class_structure import DeliberationSetting
 
 iterations_per_agent = 5000
 competence = 0.6
-agent_counts = [2,4,8,16,32]  # Number of agents from 2 to 10
+agent_counts = [3,6]  # Number of agents from 2 to 10
 
 # Array with values showing success rate corresponding to number of agents
 success_rates = []
