@@ -330,7 +330,8 @@ class Crowd: # Some sort of dynamic process tracker / protocol initally, now a c
         print('Generating plot for deliberation end result...')
         self.plot_agent_evidence(self.agents)
 
-        print(f'_______________WINNER {self.get_winner(self.profile)}.______________')
+        printprofile = self.profile
+        print(f'_______________WINNER {self.get_winner(printprofile)}.______________')
         print(f'Termination at round {round}: No more dissenters.' if ret_reason == None else f'Termination at round {round}: {ret_reason}')
         return self.get_winner(self.profile)
         

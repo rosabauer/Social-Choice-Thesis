@@ -13,6 +13,5 @@ while i != 0:
     results.append(deliberation_result)
     i -= 1
 
-
 print('--------')
 print('FINAL Result: ',results)
