@@ -2,6 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sympy import binomial
 
+'''This has the same version of the function in it as evidence-probability-function, 
+but with a scatter plot visualization instead of a continuous plot.
+
+UPDATE: Function correctly modified, and visual was also broken. '''
+
 # Define ranges for a, b, and p
 a_vals = np.arange(0, 10)
 b_vals = np.arange(0, 10)
@@ -16,9 +21,11 @@ def lower_bound_func(a_val, b_val, p_val):
     b_val = int(b_val)
     
     result = 0
-    for k in range(0, a_val - b_val + 1):
-        term = binomial(a_val, b_val + k) * binomial(b_val, b_val) * p_val**(2*b_val + k) * (1 - p_val)**(a_val + b_val - (2*b_val + k))
-        result += term
+    
+    for m in range(b_val+1):
+        for k in range(a_val - m + 1):
+            term = binomial(a_val, m + k) * binomial(b_val, m) * p_val**(2*m + k) * (1 - p_val)**(a_val + b_val - (2*m + k))
+            result += term
     return result
 
 # Compute the function values
@@ -30,21 +37,20 @@ for i, a_val in enumerate(a_vals):
 fig = plt.figure(figsize=(10, 6))
 ax = fig.add_subplot(111, projection='3d')
 
-# Plotting points where a and b are integers
-A, B = np.meshgrid(a_vals, b_vals)
-A = A.flatten()
-B = B.flatten()
+# Ensure correct reshaping and flattening
+A, B = np.meshgrid(a_vals, b_vals, indexing='ij')
 C = results.flatten()
-ax.scatter(A, B, C, c=C, cmap='viridis')
+
+ax.scatter(A.flatten(), B.flatten(), C, c=C, cmap='viridis')
 
 ax.set_xlabel('a')
 ax.set_ylabel('b')
 ax.set_zlabel('Function Value')
 plt.title('Winning Evidence Probability Plot for p=0.7')
 
-plt.show()
-
-print('This is a test.')
-print(lower_bound_func(8, 1, 0.7))
+# Test cases
+print(lower_bound_func(10, 1, 0.7))
 print(lower_bound_func(1, 8, 0.7))
-print(lower_bound_func(0, 8, 0.7))  # Makes sense, since a is the correct option
+print(lower_bound_func(0, 8, 0.7))
+
+plt.show()
