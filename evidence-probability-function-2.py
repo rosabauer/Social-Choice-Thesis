@@ -48,9 +48,13 @@ ax.set_ylabel('b')
 ax.set_zlabel('Function Value')
 plt.title('Winning Evidence Probability Plot for p=0.7')
 
-# Test cases
+# Test cases general
 print(lower_bound_func(10, 1, 0.7))
 print(lower_bound_func(1, 8, 0.7))
 print(lower_bound_func(0, 8, 0.7))
+
+# Testing for theorem calculations start here
+
+print(lower_bound_func(6,4,0.7))
 
 plt.show()
